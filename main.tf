@@ -1,8 +1,10 @@
+# apply DRY  do not repeat yourself
 provider "aws" {
     region = "eu-west-1"
     # This will allow terraform to create services on eu-west-1
- # Lets start with launching ec2 instance using terraform script
+    # Lets start with launching ec2 instance using terraform script
 }
+
 resource "aws_instance" "app_instance" {
   # Add the ami id for 18.06LTS
   ami = var.app_ami_id
@@ -15,17 +17,6 @@ resource "aws_instance" "app_instance" {
   }
   key_name = var.aws_key_name # ensure that we have this key in .ssh folder
 }
-
-# resource "aws_vpc" "eng99_terraform_vpc" {
-#   cidr_block = var.cidr_block 
-#   # "10.0.0.0/16"
-#   instance_tenancy = "default"
-  
-#   tags = {
-#     Name = var.vpc_name
-#   }
-# } 
-# apply DRY  do not repeat yourself
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
@@ -43,5 +34,44 @@ module "vpc" {
   tags = {
     Terraform = "true"
     Environment = "dev"
+  }
+}
+
+# create security group
+
+# create security group
+
+resource "aws_security_group" "allow_tls" {
+  name        = "eng99_ali_terraform"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    description      = "access the app from anywhere world"
+    from_port        = 3000
+    to_port          = 3000
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  ingress {
+    description      = "ssh from world"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "allow_tls"
   }
 }
