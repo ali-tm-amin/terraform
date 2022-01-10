@@ -1,0 +1,51 @@
+---
+ #Run Mongodb Playbook
+  #- name: Running MongoDB Playbook
+   # import_playbook: mongo.yml
+
+  #Run Nginx Playbook
+  #- name: Running Nginx Playbook
+   # import_playbook: nginx.yml
+
+- hosts: awsweb
+  gather_facts: true
+  become: true
+  tasks:
+  - name: install nodejs
+    apt: pkg=nodejs state=present
+    become_user: root
+
+  - name: Install NPM
+    apt: pkg=npm state=present
+
+
+  - name: Clone git
+    git:
+      repo: https://github.com/ali-tm-amin/Eng99App.git
+      dest: /home/vagrant/app
+      clone: yes
+      update: yes
+
+  - name: download latest npm + Mongoose
+    shell: |
+      npm install -g npm@latest
+      npm install mongoose -y
+  # Downloading pm2
+  - name: Install pm2
+    npm:
+      name: pm2
+      global: yes
+
+  - name: seed + run app
+    shell: |
+      cd app/app
+      npm install
+      node seeds/seed.js
+      pm2 kill
+      pm2 start app.js
+
+#     environment:
+# # This is where you enter the environment variable to tell the app where to look for the db
+#       DB_HOST: mongodb://ubuntu@<ENTER DB IP HERE>:27017/posts?authSource=admin
+#- name: env & source
+#    shell: source /home/vagrant/.bashrc && echo export DB_HOST=mongodb://192.168.56.10:27017/posts >> /home/vagrant/.bashrc

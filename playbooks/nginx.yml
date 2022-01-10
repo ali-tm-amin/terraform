@@ -1,0 +1,16 @@
+#this file is to conggure and install nginx in web agent node
+#Which host do we need to install nginx in
+---
+- hosts: awsweb 
+  gather_facts: true
+#WHat facts do we want to see while installing
+
+#Do we need admin access? yes 
+  become: true
+
+#What task do we wnt to perform in this tml file 
+  tasks: 
+  - name: install Nginx in web Agent Node 
+    apt: pkg=nginx state=present 
+    become_user: root 
+#What is the end goal for this task
