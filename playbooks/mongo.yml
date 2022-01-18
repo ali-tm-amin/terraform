@@ -3,7 +3,7 @@
 
 ---
 
-- hosts: awsdb
+- hosts: db
 
   gather_facts: yes
 
