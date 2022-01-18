@@ -1,0 +1,2 @@
+[db] 
+ec2-instance ansible_host=10.0.1.71 ansible_user=ubuntu
